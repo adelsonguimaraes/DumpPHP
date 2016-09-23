@@ -1,0 +1,328 @@
+<html ng-app="blackcoffeephp">
+<head>
+	<title>DumpPHP</title>
+
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<style type="text/css">
+		body {
+			background: #ddd;
+		}
+		.logo {
+			background: #e6e6e6;
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			z-index: 1050;
+			text-align: center;
+		}
+		.logo > img {
+			top:500;
+			padding: 50px;
+			height: 500px;
+		}
+	</style>
+
+</head>
+<body ng-controller="main">
+	<!-- <div class="logo" ng-if="splash">
+		<br><br>
+		<h1> Bem vindo </h1>
+		<img src="dist/img/blackcoffee.png">
+		<h1>2016 - Versão 1.0 </h1>
+	</div> -->
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    	<div class="container" style="padding-top:15px; text-align:center; color:#fff;">
+	         <h4>DumpPHP 1.0</h4>
+	    </div>
+	</nav>
+	<br><br><br><br><br>
+	<div class="container" ng-if="!confs.id || viewconfig">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3>Configurações <i class="glyphicon glyphicon-cog btn btn-danger pull-right" title="Acessar Painel" ng-click="config()"></i> </h3>
+			</div>
+			<div class="panel-body">
+				<div class="alert" ng-class="msg.class" role="alert" ng-if="msg.msg">
+				  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				  	<span class="sr-only">Error:</span>
+				  	{{msg.msg}}
+				</div>
+				<form>
+					<div class="form-group">
+							Intervalo: <small class="text-danger"> Número limite que define o tempo de intervalo. </small>
+							<input type="text" class="form-control" id="intervalo" name="intervalo"  ng-model="confs.intervalo">
+					</div>
+					<div class="form-group">
+							Unidade Intervalo: <small class="text-danger"> Unidade de tempo que deve ser contado o intervalo. </small>
+						<select class="form-control" id="unidadeintervalo" name="unidadeintervalo"  ng-model="confs.unidadeintervalo">
+							<option value="SEGUNDO">Segundo</option>
+							<option value="MINUTO">Minuto</option>
+							<option value="HORA">Hora</option>
+							<option value="DIA">Dia</option>
+							<option value="SEMANA">Semana</option>
+							<option value="MES">Mes</option>
+							<option value="ANO">Ano</option>
+						</select>
+					</div>
+					<div class="form-group">
+							E-mails: <small class="text-danger"> Separe os e-mails por vírgula, exemplo: ex@email.com, ex2@email.com</small>
+							<input type="text" class="form-control" id="emails" name="emails"  ng-model="confs.emails">
+					</div>
+					<div class="form-group">
+						Ativo: <small class="text-danger"> Ativa ou desativa o sistema de Backup. </small>
+						<select class="form-control" id="ativo" name="ativo"  ng-model="confs.ativo">
+							<option value="SIM">Sim</option>
+							<option value="NAO">Não</option>
+						</select>
+					</div>
+					<button class="btn btn-success pull-right" ng-click="salvar(confs)">
+						Salvar
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="container" ng-if="confs.id && !viewconfig">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3>Painel de Backup do Sistema <i class="glyphicon glyphicon-cog btn btn-warning pull-right" title="Acessar as configurações" ng-click="config()"></i> </h3>
+				</div>
+				<div class="panel-body">
+					<div class="alert" ng-class="msg.class" role="alert" ng-if="msg.msg">
+					  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					  	<span class="sr-only">Error:</span>
+					  	{{msg.msg}}
+					</div>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<td>ID</td>
+									<td>Arquivo</td>
+									<td>E-mails</td>
+									<td>Período</td>
+									<td>Data</td>
+									<td width="10%">Ações</td>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+								<tr ng-repeat="obj in logs">
+									<td ng-bind="obj.id"></td>
+									<td ng-bind="obj.arquivo"></td>
+									<td ng-bind="obj.emails"></td>
+									<td ng-bind="obj.periodo"></td>
+									<td ng-bind="obj.datacadastro"></td>
+									<td class="text-right">
+										<div class="btn-group">
+											<button class="btn btn-defalut" type="button" title="Baixar" ng-click="down(obj)">
+												<i class="glyphicon glyphicon-floppy-save"></i>
+											</button>
+											<button class="btn btn-danger" type="button" title="Deletar" ng-click="delete(obj)">
+												<i class="glyphicon glyphicon-trash"></i>
+											</button>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<hr>
+						<form>
+							<button class="btn btn-primary btn-lg pull-right" type="button" id="gerar" name="gerar" ng-click="gerar()">
+								Iniciar Novo Backup
+							</button>
+						</form>
+					</div>
+					<br>
+					<hr>
+					<h3> O procedimento fornece </h3>
+					<ul>
+						<li><label><strong>Tabelas</strong> : Todas as Tabelas do banco de dados.</label></li>
+						<li><label><strong>Dados</strong> : Todos os Dados alocados no banco de dados.</label></li>
+						<li><label><strong>Sotored</strong> : Todas as Stored Procedures alocadas no banco de dados.</label></li>
+						<li><label><strong>Views</strong> : Todas as Views criadas no banco.</label></li>
+						<li><label><strong>LOG</strong> : Registro de Log do Backup gerado.</label></li>
+						<li><label><strong>Arquivo</strong> : Arquivo .sql dentro da pasta backup.</label></li>
+						<li><label><strong>Email</strong> : Caso configurado será habilitado envio de emails.</label></li>
+					</ul>
+				</div>
+				<div class="panel-footer">
+					DumpPHP 1.0
+				</div>
+			</div>
+	</div>
+	<br><br><br><br><br>
+	<nav class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
+    	<div class="container" style="padding-top:15px; text-align:center; color:#fff;">
+	         DumpPHP 2016 - by Adelson Guimarães
+	    </div>
+	</nav>
+
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js" crossorigin="anonymous"></script>
+
+	<script type="text/javascript">
+		angular.module("blackcoffeephp", []);
+		angular.module("blackcoffeephp").controller("main", function ($scope, $http, $timeout) {
+			// function splash () {
+			// 	$scope.splash = true;
+			// 	$timeout(function () {
+			// 		$scope.splash = false;
+			// 	},3000);
+			// }
+			// splash();
+
+			// $scope.confs = [];
+
+			$scope.confs = {
+				"intervalo" : 1,
+				"unidadeintervalo": 'SEGUNDO',
+				"ativo":"SIM"
+			}
+
+			$scope.loadConfig = function () {
+				var data = {
+					'metodo':'loadConfig'
+				}
+
+				$http({
+		            method: 'POST',
+		            url: "dump.php",
+		            data: data
+		        })
+				.then(function successCallback(response) {
+	                if ( response.data ) $scope.confs = response.data;
+	            }, function errorCallback(response) {
+	            });
+			}
+			$scope.loadConfig();
+
+			$scope.viewconfig = false;
+			$scope.config = function () {
+				if ( $scope.viewconfig == false ) {
+					$scope.viewconfig = true;
+				}else{
+					$scope.viewconfig = false;
+				}
+			}
+
+			$scope.msg = {
+				"class" : "",
+				"msg": ""
+			}
+
+			$scope.salvar = function ( obj ) {
+				
+				var data = {
+					'data' : obj,
+					'metodo' : 'salvaConfig'
+				}
+
+				$http({
+		            method: 'POST',
+		            url: "dump.php",
+		            data: data
+		        })
+				.then(function successCallback(response) {
+					$scope.msg.msg = response.data.msg;
+	                $scope.msg.class = "alert-success";
+	                $scope.loadConfig();
+
+	                $timeout( function () {
+                		$scope.msg.msg = "";
+                		$scope.msg.class = "";
+                	}, 5000);
+	            }, function errorCallback(response) {
+	            });
+			}
+
+			$scope.load = function () {
+				
+				var data = {
+					'metodo':'listarLogs'
+				}
+
+				$http({
+		            method: 'POST',
+		            url: "dump.php",
+		            data: data
+		        })
+				.then(function successCallback(response) {
+	                $scope.logs = response.data;
+	            }, function errorCallback(response) {
+	            });
+			}
+
+			$scope.load();
+
+			$scope.down = function ( obj ) {
+				 window.open('backup/'+obj.arquivo, '_blank');
+			}
+
+			$scope.delete = function (obj) {
+				var data = {
+					'metodo':'delete',
+					'data': obj
+				}
+
+				$http({
+		            method: 'POST',
+		            url: "dump.php",
+		            data: data
+		        })
+				.then(function successCallback(response) {
+						$scope.load();
+	                	$scope.msg.msg = response.data.msg;
+	                	$scope.msg.class = "alert-success";
+
+	                	$timeout( function () {
+	                		$scope.msg.msg = "";
+	                		$scope.msg.class = "";
+	                	}, 5000);	            
+	                }, function errorCallback(response) {
+	            });
+			}
+
+			$scope.gerar = function () {
+				
+				var data = {
+					'metodo' : 'init'
+				}
+
+				$http({
+		            method: 'POST',
+		            url: "dump.php",
+		            data: data
+		        })
+				.then(function successCallback(response) {
+	                if ( response.data.success === true ) {
+	                	$scope.load();
+	                	$scope.msg.msg = response.data.msg;
+	                	$scope.msg.class = "alert-success";
+
+	                	$timeout( function () {
+	                		$scope.msg.msg = "";
+	                		$scope.msg.class = "";
+	                	}, 5000);
+	                }else{
+	                	$scope.msg.msg = response.data.msg;
+	                	$scope.msg.class = "alert-danger";
+
+	                	$timeout( function () {
+	                		$scope.msg.msg = "";
+	                		$scope.msg.class = "";
+	                	}, 5000);
+	                }
+	            }, function errorCallback(response) {
+	            });
+			}
+		});
+	</script>
+</body>
+</html>
