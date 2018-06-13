@@ -22,9 +22,13 @@ Atualmente o DumpPHP não faz backup de Triggers do MySQL, o que deixa o backup 
 
 # O que preciso para utilizar o DumpPHP em meus projetos?
 Inicialmente é necessário ter conhecimento em PHP, MySQL, para fazer as configurações inciais.
+
 A primeira coisa a fazer é baixar o Dump e adicioná-lo ao seu projeto.
+
 Em seguida, adicionar ao seu banco de dados MySQL as tabelas de configuração que o Dump utiliza, o .sql com as tabelas pode ser encontrado dentro da pasta util.
+
 Feito isso abra o arquivo Conexao.php dentro da pasta util e configure com as informações do banco de dados.
+
 Pronto, está tudo configurado, agora basta acessar via Navegador o diretorio do Dump dentro do seu site e a tela inicial será apresentada.
 
 # Considerações
